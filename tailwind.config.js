@@ -1,3 +1,5 @@
+import tailwindcssAnimate from 'tailwindcss-animate';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
@@ -36,6 +38,35 @@ export default {
           DEFAULT: 'var(--color-danger)',
           muted: 'var(--color-danger-muted)',
         },
+        /* shadcn/ui semantic aliases — same tokens, so generated components match the POS theme */
+        background: 'var(--color-surface)',
+        foreground: 'var(--color-content)',
+        primary: {
+          DEFAULT: 'var(--color-accent)',
+          foreground: 'var(--color-content-inverse)',
+        },
+        secondary: {
+          DEFAULT: 'var(--color-surface-muted)',
+          foreground: 'var(--color-content)',
+        },
+        muted: {
+          DEFAULT: 'var(--color-surface-muted)',
+          foreground: 'var(--color-content-muted)',
+        },
+        destructive: {
+          DEFAULT: 'var(--color-danger)',
+          foreground: 'var(--color-content-inverse)',
+        },
+        card: {
+          DEFAULT: 'var(--color-surface)',
+          foreground: 'var(--color-content)',
+        },
+        popover: {
+          DEFAULT: 'var(--color-surface)',
+          foreground: 'var(--color-content)',
+        },
+        ring: 'var(--color-accent)',
+        input: 'var(--color-border)',
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
@@ -51,5 +82,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [tailwindcssAnimate],
 };

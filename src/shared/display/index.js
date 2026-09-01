@@ -1,1 +1,1 @@
-export { Badge } from './Badge.jsx';
+export { Badge, badgeVariants } from './Badge.jsx';

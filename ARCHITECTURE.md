@@ -7,6 +7,7 @@ Single source of truth for the React UI codebase. Read this before modifying fro
 - **React** (JavaScript) — UI
 - **Vite** — build tooling
 - **Tailwind CSS** — styling (design tokens via CSS variables)
+- **shadcn/ui** — modern React UI components (copied into `shared/`, not used as a runtime package)
 - **React Router** — routing
 - **Tauri** — native desktop shell (`src-tauri/`)
 
@@ -79,11 +80,11 @@ Configured in `vite.config.js` and `jsconfig.json`:
 
 ### `shared/` — Design System
 
-Reusable UI for **any** business type:
+Reusable UI for **any** business type. Prefer **shadcn/ui** primitives here for buttons, inputs, dialogs, tables, and similar modern React components.
 
 ```
 shared/
-├── ui/           # Button, Input, Select, Card, etc.
+├── ui/           # shadcn/ui primitives (Button, Input, Select, Card, etc.)
 ├── forms/        # Form fields, validation wrappers
 ├── tables/       # Data tables, pagination
 ├── dialogs/      # Modal, Drawer, ConfirmationDialog
@@ -95,6 +96,8 @@ shared/
 **Must NOT contain:** business-specific components (e.g. `RetailProductCard`).
 
 If a component is genuinely reusable across businesses, it belongs here. If it uses business terminology or workflow, it belongs in a module.
+
+shadcn/ui components are owned by this codebase (copied into `shared/ui/` and adapted to design tokens). Do not import them from a third-party UI kit at call sites. Modules consume them through `@shared`, never by adding a parallel component library.
 
 ### `modules/` — Business-Specific UI
 
@@ -236,11 +239,15 @@ Adding a new business type primarily means adding a new folder under `modules/` 
 ## Design System
 
 - **Tokens:** CSS custom properties in `assets/styles/tokens.css`
-- **Tailwind:** extended in `tailwind.config.js` to reference token variables
+- **Tailwind:** extended in `tailwind.config.js` to reference token variables (includes shadcn semantic aliases such as `primary` / `destructive` mapped to the same tokens)
+- **shadcn/ui:** source of modern React UI primitives; copied into `shared/ui/` (and related `shared/` folders) and styled with Tailwind + design tokens
+- **shadcn CLI:** `components.json` — JavaScript, output path `shared/ui/`. Add a primitive with `npx shadcn@latest add <component>`, then restyle to tokens if needed. Do **not** create `src/components/`
 - **Theme:** `core/theme/ThemeProvider.jsx` toggles `light`/`dark` class on `<html>`
 - **Global styles:** `assets/styles/global.css`
 
-Shared components (when implemented) use tokens and Tailwind utilities — not hardcoded colors.
+Shared components use tokens and Tailwind utilities — not hardcoded colors. When adding a new generic control, start from shadcn/ui and place it in `shared/`. Do not introduce another UI library alongside it.
+
+Existing cashier screens already have working primitives (`Button`, `Input`, `Modal`, `Table`, …). Keep their look; use shadcn for new shared controls or to replace a primitive when accessibility or composition is clearly better.
 
 ## State Management
 
@@ -260,7 +267,7 @@ Shared components (when implemented) use tokens and Tailwind utilities — not h
 2. Add retail-specific components in `modules/retail/components/<feature>/`
 3. Register route in `modules/retail/navigation/routes.jsx`
 4. Register nav item in `modules/retail/navigation/index.js`
-5. Reuse `shared/` components where appropriate
+5. Reuse `shared/` (shadcn/ui) components where appropriate; do not add business-specific copies of the same primitive
 6. Call APIs through `services/api/`, not from components directly
 7. Keep retail terminology inside the retail module
 
