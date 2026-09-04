@@ -23,6 +23,13 @@ export default defineConfig({
   server: {
     port: 1420,
     strictPort: true,
+    proxy: {
+      // Forwards same-origin /api calls to the Express backend (see server/).
+      '/api': {
+        target: process.env.VITE_API_URL || 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
   },
   envPrefix: ['VITE_', 'TAURI_'],
   build: {

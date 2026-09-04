@@ -1,6 +1,8 @@
-# Innosify POS — Frontend Architecture
+# Innosify POS — Architecture
 
-Single source of truth for the React UI codebase. Read this before modifying frontend code.
+Single source of truth for the codebase. Read this before modifying code.
+Covers the React frontend (`src/`), the Express + SQLite backend (`server/`),
+and the Tauri desktop shell (`src-tauri/`).
 
 ## Stack
 
@@ -10,6 +12,8 @@ Single source of truth for the React UI codebase. Read this before modifying fro
 - **shadcn/ui** — modern React UI components (copied into `shared/`, not used as a runtime package)
 - **React Router** — routing
 - **Tauri** — native desktop shell (`src-tauri/`)
+- **Express 4 + node:sqlite** — REST backend (`server/`, Node >= 22, zero native deps)
+- **SQLite** — file database (`server/data/pos.db`, gitignored, seeded on first boot)
 
 ## Architecture Model
 
@@ -37,6 +41,15 @@ src/
 └── assets/                  # Global static assets (icons, fonts, images, logos)
 
 src-tauri/                   # Tauri native layer (Rust) — separate from React UI
+
+server/                      # Express + SQLite REST backend (Node >= 22)
+├── package.json             # innosify-pos-server (express, cors)
+└── src/
+    ├── index.js             # App bootstrap, /api/health, error handling (PORT, default 3001)
+    ├── db.js                # node:sqlite connection + schema (server/data/pos.db)
+    ├── seed.js              # First-boot seed data (mirrors frontend demo catalog)
+    └── routes.js            # REST routers: products, customers, sales, held-sales,
+                             # returns, cash-movements, shifts
 ```
 
 ### Path Aliases
@@ -254,12 +267,102 @@ Existing cashier screens already have working primitives (`Button`, `Input`, `Mo
 - Global store slices in `store/` by responsibility
 - Module-specific state co-located with the module (e.g. `modules/retail/store/` when needed)
 - Do not create one monolithic store file
+- Backend-backed state follows the offline-first sync strategy documented in
+  [Backend (`server/`)](#backend-server): hydrate on mount, local-first
+  mutations, `backendStatus` (`local`/`backend`) exposed for UI indicators
 
 ## Tauri Integration
 
 - Native commands defined in `src-tauri/src/`
 - React accesses native capabilities **only** through `services/desktop/`
 - Business components never import Tauri APIs directly
+
+## Backend (`server/`)
+
+Express 4 + SQLite REST API. Uses the built-in `node:sqlite` module, so there
+are **no native dependencies** (requires Node >= 22). The SQLite file
+(`server/data/pos.db`, gitignored) is created and seeded on first boot;
+`seed.js` mirrors the frontend demo catalog (clothing products, customers,
+`ORD-*` sales, held sales, cash movements, open shift).
+
+### Run
+
+```bash
+npm --prefix server install   # one-time
+npm run server                # start API on http://localhost:3001 (root script)
+npm run server:dev            # same with --watch reload
+```
+
+The Vite dev server proxies same-origin `/api` to `http://localhost:3001`
+(`vite.config.js` → `server.proxy`). Production can point elsewhere via
+`VITE_API_URL` (see `.env.example`). Health check: `GET /api/health`.
+
+### Endpoints
+
+| Method | Path | Notes |
+|--------|------|-------|
+| GET/POST | `/api/products`, `/api/customers`, `/api/held-sales`, `/api/returns`, `/api/cash-movements` | Full list / create (client-generated ids) |
+| GET/PATCH | `/api/products/:id`, `/api/customers/:id` | Read / update |
+| GET/POST/PATCH | `/api/sales`, `/api/sales/:id` | PATCH updates `status` (void / return flows) |
+| DELETE | `/api/held-sales/:id` | Resume / delete a hold |
+| GET | `/api/shifts`, `/api/shifts/current` | Latest shift |
+| POST | `/api/shifts`, `/api/shifts/:id/close` | Open / close (`closingCash`, `variance`) |
+
+Conventions: camelCase JSON contract matching the React store shapes;
+JSON columns stored as TEXT; `409` on duplicate id; `400` on missing required
+fields; `POST /api/sales` decrements product stock (floored at 0);
+`POST /api/returns` marks the original sale `returned` / `partial_return`.
+No auth yet — add before any multi-user deployment.
+
+### Frontend sync strategy (offline-first)
+
+- `services/api/` (`posApi`, `ApiError`) is the **only** HTTP boundary —
+  components and the store never call `fetch` directly.
+- `CashierProvider` hydrates all collections from the API on mount and sets
+  `backendStatus` to `'backend'`. If the API is unreachable it stays `'local'`
+  on seed data, so the app always runs standalone.
+- Mutations are **local-first, fire-and-forget sync**: UI state commits
+  immediately, then mirrors to the API when `backendStatus === 'backend'`.
+  Sync failures are swallowed — local data stays valid.
+- The active cart is additionally persisted to `localStorage`
+  (`onepos-active-cart-v1`) so reloads / direct URL visits never empty it.
+
+## Implemented Retail Screens
+
+OnePos-branded POS built from design mocks. Shared chrome for management
+screens lives in `modules/retail/components/PosPageShell.jsx` (`PosPageShell`,
+`CustomerPill`, `ShellCard`, `ShortcutBar`, sidebar `activeVariant`
+`solid`/`soft`, footers: `logout`/`store`/`terminal`/`cashier`/`help`/`secure`).
+The sidebar is constant on every screen: a single `POS_NAV` definition
+(New Sale, Held Sales, Sales, Returns & Exchanges, Customers, Current Shift,
+Cash Movements, Help, Profile) with the same solid-blue active style is used
+by both `core/layout/Sidebar.jsx` (New Sale) and every `PosPageShell` screen —
+do not add per-screen nav menus.
+
+`AppLayout` keeps a single `<Outlet />` at a stable tree position across all
+routes — conditional Sidebar/Header/footer siblings may mount or unmount, but
+the Outlet itself must never move, otherwise `RetailLayout` and the cart
+provider remount and cart state is lost on navigation.
+`AppLayout` renders no chrome of its own for these routes (managed-page regex
+in `core/layout/AppLayout.jsx`); `/` and unknown paths redirect to `/retail`.
+
+| Route | Screen | Notes |
+|-------|--------|-------|
+| `/retail/new-sale` | New Sale | Search, category pills, product grid, cart panel, Hold/Checkout, F-key shortcuts |
+| `/retail/checkout` | Checkout | Own chrome; customer / order / pricing / payment cards; tip + notes; split payments; cash-received + change |
+| `/retail/payment-complete` | Payment Success | Receipt summary, amount received / change due; last sale persisted (`LAST_SALE_KEY`) for refresh |
+| `/retail/held-sales` | Held Sales | Count badge, search, Resume/Delete, New Sale button |
+| `/retail/sales` | Sales | Live stat cards, filters (search, date, method, cashier, status), pagination, View/Print |
+| `/retail/sales/:id` | Order Details | Customer + payment info, item table with SKUs, totals, notes, receipt modal |
+| `/retail/returns` | Returns & Exchanges | Sale lookup, Find Sale / Recent Returns tabs, return-qty steppers, refund math, exchange toggle |
+| `/retail/returns/success` | Return Processed | Refund receipt; last return persisted (`LAST_RETURN_KEY`) |
+| `/retail/cash-movements` | Cash Movements | Cash In/Out forms with reasons + notes, live drawer balance, recent table |
+| `/retail/shift` | Current Shift | Live shift strip, sales summary, drawer status, End Shift flow |
+
+Store behaviors worth knowing: `completeSale` records tip/notes/amount-received/
+change-due with `ORD-*` ids; `holdSale` stamps `heldBy`; `processReturn`
+computes full vs partial status; payment methods include `cash`/`card`/`upi`/
+`wallet`/`split`; tax rate is 8% (`TAX_RATE`).
 
 ## Adding a New Feature (within Retail)
 

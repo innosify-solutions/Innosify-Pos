@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "server": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",

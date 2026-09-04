@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '@core/layout';
 import { getActiveModuleRoutes } from './moduleRegistry.js';
 
@@ -14,6 +14,7 @@ export function AppRouter() {
       <Routes>
         <Route element={<AppLayout />}>
           {moduleRoutes}
+          <Route path="*" element={<Navigate to="/retail" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

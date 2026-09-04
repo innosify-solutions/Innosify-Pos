@@ -4,6 +4,8 @@ export const PAYMENT_METHODS = {
   CASH: 'cash',
   CARD: 'card',
   UPI: 'upi',
+  WALLET: 'wallet',
+  SPLIT: 'split',
 };
 
 export const SALE_STATUS = {

@@ -1,4 +1,3 @@
-import { Button } from '@shared/ui/Button';
 import { formatCurrency } from '../../utils/cashier.utils';
 
 export function CartItem({ item, onQuantityChange, onRemove, onEdit }) {
@@ -6,39 +5,35 @@ export function CartItem({ item, onQuantityChange, onRemove, onEdit }) {
   const lineTotal = price * item.quantity - (item.discount || 0);
 
   return (
-    <div className="flex gap-3 border-b border-border py-3 last:border-0">
-      <div className="flex-1 min-w-0">
-        <p className="truncate text-sm font-medium text-content">{item.name}</p>
-        <p className="text-xs text-content-muted">
-          {formatCurrency(price)}
-          {item.discount > 0 && <span className="ml-1 text-success">-{formatCurrency(item.discount)}</span>}
-          {item.priceOverride != null && <span className="ml-1 text-warning">(override)</span>}
-        </p>
+    <div className="flex items-center gap-2 border-b border-gray-100 py-2.5 last:border-0">
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[13px] font-semibold text-gray-900">{item.name}</p>
+        <p className="text-[11px] text-gray-500">{formatCurrency(price)} each</p>
       </div>
       <div className="flex items-center gap-1">
         <button
           type="button"
           onClick={() => onQuantityChange(item.productId, Math.max(1, item.quantity - 1))}
-          className="flex h-8 w-8 items-center justify-center rounded border border-border text-content hover:bg-surface-muted"
+          className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-100"
           aria-label="Decrease quantity"
         >
           −
         </button>
-        <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+        <span className="w-6 text-center text-[13px] font-semibold">{item.quantity}</span>
         <button
           type="button"
           onClick={() => onQuantityChange(item.productId, item.quantity + 1)}
-          className="flex h-8 w-8 items-center justify-center rounded border border-border text-content hover:bg-surface-muted"
+          className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-100"
           aria-label="Increase quantity"
         >
           +
         </button>
       </div>
-      <div className="flex flex-col items-end gap-1">
-        <span className="text-sm font-semibold text-content">{formatCurrency(lineTotal)}</span>
-        <div className="flex gap-1">
-          <button type="button" onClick={() => onEdit(item)} className="text-xs text-accent hover:underline">Edit</button>
-          <button type="button" onClick={() => onRemove(item.productId)} className="text-xs text-danger hover:underline">Remove</button>
+      <div className="flex w-[72px] flex-col items-end">
+        <span className="text-[13px] font-bold text-gray-900">{formatCurrency(lineTotal)}</span>
+        <div className="flex gap-1.5">
+          <button type="button" onClick={() => onEdit(item)} className="text-[11px] text-blue-600 hover:underline">Edit</button>
+          <button type="button" onClick={() => onRemove(item.productId)} className="text-[11px] text-red-500 hover:underline">✕</button>
         </div>
       </div>
     </div>

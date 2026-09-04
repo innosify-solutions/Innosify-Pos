@@ -2,7 +2,7 @@ export const initialShift = {
   id: 'shift-001',
   status: 'open',
   openedAt: '2026-09-01T08:00:00',
-  openedBy: 'John Doe',
+  openedBy: 'Walk-in Cashier',
   openingCash: 5000,
   closedAt: null,
   closingCash: null,
