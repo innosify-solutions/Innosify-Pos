@@ -13,6 +13,9 @@
 
   body {
     @apply bg-surface text-content font-sans antialiased;
+    /* tabular figures keep prices/totals/SKUs aligned; optimizeLegibility for premium rendering */
+    font-variant-numeric: tabular-nums;
+    text-rendering: optimizeLegibility;
   }
 }
 

@@ -1,6 +1,6 @@
 :root {
-  /* Typography */
-  --font-sans: 'Inter', system-ui, sans-serif;
+  /* Typography — Inter first, platform-ui fallback (works offline too) */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* Spacing */
