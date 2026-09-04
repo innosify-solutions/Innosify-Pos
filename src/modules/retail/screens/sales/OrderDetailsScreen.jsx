@@ -4,7 +4,6 @@ import { formatCurrency } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 import { retailConfig } from '../../config/retail.config.js';
 import { ReceiptModal } from '../new-sale/SaleCompleteModal';
-import { PosPageShell, POS_NAV } from '../../components/PosPageShell.jsx';
 
 const base = retailConfig.routePrefix;
 
@@ -37,7 +36,7 @@ function formatLong(iso) {
   return `${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
 }
 
-const CATEGORY_EMOJI = { clothing: '👕', sarees: '🥻', ethnic: '👘', western: '👚', accessories: '👜' };
+const CATEGORY_EMOJI = { silk: '🥻', cotton: '🥻', banarasi: '🥻', kanjivaram: '🥻', chiffon: '🥻', georgette: '🥻', linen: '🥻', sarees: '🥻' };
 
 export function OrderDetailsScreen() {
   const navigate = useNavigate();
@@ -68,40 +67,7 @@ export function OrderDetailsScreen() {
   const dateLabel = new Date(sale.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <PosPageShell
-      title={
-        <span className="flex items-center gap-2 text-[16px] font-semibold text-gray-900">
-          Sales
-          <span className="text-gray-400">›</span>
-          <span className="text-blue-600">View</span>
-        </span>
-      }
-      topRight={
-        <>
-          <span className="flex items-center gap-1.5 text-[13px] font-medium text-gray-700">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            {dateLabel}
-          </span>
-          <span className="h-5 w-px bg-gray-300" />
-          <span className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-900">
-            <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="leading-tight">
-              <span className="block">Admin</span>
-              <span className="block text-[11px] font-normal text-gray-500">Manager</span>
-            </span>
-            <svg className="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </span>
-        </>
-      }
-      navItems={POS_NAV}
-      footer="help"
-    >
+    <div className="flex h-full flex-col p-4">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-[22px] font-bold text-gray-900">Order Details</h2>
@@ -271,6 +237,6 @@ export function OrderDetailsScreen() {
         onClose={() => setReceiptOpen(false)}
         onNewSale={() => navigate(`${base}/new-sale`)}
       />
-    </PosPageShell>
+    </div>
   );
 }

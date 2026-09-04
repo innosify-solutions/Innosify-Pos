@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@utils/cn';
 import { formatCurrency } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 import { retailConfig } from '../../config/retail.config.js';
-import { POS_NAV, NAV_ICONS } from '../../components/PosPageShell.jsx';
 import { CustomerSelectModal } from '../new-sale/CustomerSelectModal';
 import { AddCustomerModal } from '../new-sale/AddCustomerModal';
 import { ConfirmationDialog } from '@shared/dialogs/ConfirmationDialog';
@@ -75,11 +74,17 @@ const FOOT_SHORTCUTS = [
   { key: 'Esc', label: 'Back to Cart' },
 ];
 
-function Card({ title, icon, children, className }) {
+function Card({ title, icon, step, children, className }) {
   return (
-    <section className={cn('rounded-lg border border-gray-200 bg-white p-4', className)}>
-      <h2 className="mb-3 flex items-center gap-2 text-[15px] font-bold text-gray-900">
-        <span className="text-blue-600">{icon}</span>
+    <section className={cn('rounded-2xl border border-gray-200 bg-white p-5 shadow-[0_1px_3px_rgba(16,24,40,0.07)]', className)}>
+      <h2 className="mb-4 flex items-center gap-2.5 text-[15px] font-bold text-gray-900">
+        {step ? (
+          <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0C4C2A] text-[12px] font-bold text-white">
+            {step}
+          </span>
+        ) : (
+          <span aria-hidden="true" className="text-emerald-700">{icon}</span>
+        )}
         {title}
       </h2>
       {children}
@@ -92,28 +97,24 @@ export function CheckoutScreen() {
   const { cart, cartTotals, selectedCustomer, billDiscount, holdSale, completeSale, PAYMENT_METHODS } = useCashier();
 
   const [method, setMethod] = useState(PAYMENT_METHODS.CASH);
-  const [tipInput, setTipInput] = useState('');
   const [notes, setNotes] = useState('');
   const [cashAmount, setCashAmount] = useState('');
   const [cardAmount, setCardAmount] = useState('');
   const [upiAmount, setUpiAmount] = useState('');
-  const [cashReceived, setCashReceived] = useState('');
   const [processing, setProcessing] = useState(false);
   const [holdConfirm, setHoldConfirm] = useState(false);
   const [customerModal, setCustomerModal] = useState(false);
   const [addCustomerModal, setAddCustomerModal] = useState(false);
-  const tipRef = useRef(null);
+  const notesRef = useRef(null);
 
-  const tip = Number(tipInput) > 0 ? Number(tipInput) : 0;
-  const grandTotal = cartTotals.total + tip;
+  const grandTotal = cartTotals.total;
   const isSplit = method === PAYMENT_METHODS.SPLIT;
   const splitTotal = (Number(cashAmount) || 0) + (Number(cardAmount) || 0) + (Number(upiAmount) || 0);
   const splitValid = Math.abs(splitTotal - grandTotal) < 0.01;
-  const cashShort = method === PAYMENT_METHODS.CASH && !isSplit && cashReceived !== '' && Number(cashReceived) < grandTotal;
 
   const canComplete = useMemo(
-    () => cart.length > 0 && !processing && (!isSplit || splitValid) && !cashShort,
-    [cart.length, processing, isSplit, splitValid, cashShort]
+    () => cart.length > 0 && !processing && (!isSplit || splitValid),
+    [cart.length, processing, isSplit, splitValid]
   );
 
   const doHold = () => {
@@ -129,7 +130,7 @@ export function CheckoutScreen() {
       const paymentDetails = isSplit
         ? {
             method: 'split',
-            tip,
+            tip: 0,
             notes: notes.trim(),
             payments: [
               { method: PAYMENT_METHODS.CASH, amount: Number(cashAmount) || 0 },
@@ -139,9 +140,9 @@ export function CheckoutScreen() {
           }
         : {
             method,
-            tip,
+            tip: 0,
             notes: notes.trim(),
-            cashReceived: method === PAYMENT_METHODS.CASH ? Number(cashReceived) || 0 : 0,
+            cashReceived: 0,
             payments: [{ method, amount: grandTotal }],
           };
       const sale = completeSale(paymentDetails);
@@ -170,7 +171,7 @@ export function CheckoutScreen() {
         navigate(`${base}/new-sale`);
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        tipRef.current?.focus();
+        notesRef.current?.focus();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -179,13 +180,13 @@ export function CheckoutScreen() {
 
   if (cart.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 bg-[#f4f6f9]">
+      <div className="flex h-full flex-col items-center justify-center gap-3">
         <p className="text-lg font-semibold text-gray-900">No items to check out</p>
         <p className="text-sm text-gray-500">Add products from New Sale first.</p>
         <button
           type="button"
           onClick={() => navigate(`${base}/new-sale`)}
-          className="mt-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+          className="mt-2 rounded-xl bg-[#0C4C2A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0a3d22] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
         >
           Back to New Sale
         </button>
@@ -194,127 +195,47 @@ export function CheckoutScreen() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-[#f4f6f9]">
-      {/* Top bar */}
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4">
-        <span className="flex items-center gap-2">
-          <svg viewBox="0 0 36 36" className="h-8 w-8">
-            <path d="M18 2 32 10v16L18 34 4 26V10L18 2z" fill="#2563eb" />
-            <path d="M18 2 32 10 18 18 4 10 18 2z" fill="#60a5fa" />
-            <path d="M18 18v16L4 26V10l14 8z" fill="#1d4ed8" />
-            <path d="M18 18v16l14-8V10l-14 8z" fill="#3b82f6" />
-          </svg>
-          <span className="text-[20px] font-bold tracking-tight text-gray-900">OnePos</span>
-        </span>
-        <span className="h-6 w-px bg-gray-300" />
-        <h1 className="text-[16px] font-semibold text-gray-900">Checkout</h1>
-        <div className="ml-auto">
-          <button
-            type="button"
-            onClick={() => setCustomerModal(true)}
-            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-800 hover:border-gray-400"
-          >
-            <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="max-w-[160px] truncate">{selectedCustomer?.name || 'Walk-in Customer'}</span>
-            <svg className="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        </div>
-      </header>
-
-      <div className="flex min-h-0 flex-1">
-        {/* Left nav */}
-        <aside className="flex w-[188px] shrink-0 flex-col border-r border-gray-200 bg-white px-2 py-2">
-          <nav className="flex-1 space-y-0.5">
-            {POS_NAV.map((item) => (
-              <NavLink
-                key={item.label}
-                to={item.path}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors',
-                    isActive ? 'bg-blue-600 font-semibold text-white' : 'text-gray-700 hover:bg-gray-100'
-                  )
-                }
-              >
-                <svg
-                  className="h-5 w-5 shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.7}
-                >
-                  {NAV_ICONS[item.icon]}
-                </svg>
-                <span className="truncate">{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
-          <button
-            type="button"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] text-gray-700 hover:bg-gray-100"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Logout
-          </button>
-        </aside>
-
-        {/* Main content */}
-        <main className="min-h-0 flex-1 overflow-y-auto p-4">
-          <div className="grid grid-cols-[minmax(0,1fr)_300px] items-start gap-4">
-            <div className="min-w-0 space-y-4">
-              <Card
-                title="Customer Information"
-                icon={
-                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z" />
-                  </svg>
-                }
-              >
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                    <svg className="h-7 w-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-[15px] font-bold text-gray-900">{selectedCustomer?.name || 'Walk-in Customer'}</p>
-                    <p className="text-[12.5px] text-gray-500">Phone: {selectedCustomer?.phone || 'Not provided'}</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setCustomerModal(true)}
-                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-blue-500 px-3 py-2 text-[13.5px] font-semibold text-blue-600 hover:bg-blue-50"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  Edit / Add Customer
-                </button>
-              </Card>
-
+    <div className="flex h-full flex-col">
+      {/* Main content */}
+      <main aria-label="Checkout" className="thin-scroll min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="grid grid-cols-[minmax(0,1fr)_320px] items-start gap-5">
+          <div className="min-w-0 space-y-4">
               <Card
                 title="Order Summary"
+                step="1"
                 icon={
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h4m-4 4h4" />
                   </svg>
                 }
               >
-                <div className="overflow-hidden rounded-md border border-gray-200">
+                <div className="mb-3 flex items-center gap-2.5 rounded-xl bg-gray-50 px-3 py-2">
+                  <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                    <svg className="h-5 w-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[14px] font-bold text-gray-900">{selectedCustomer?.name || 'Walk-in Customer'}</span>
+                    <span className="block text-[12px] text-gray-500">Phone: {selectedCustomer?.phone || 'Not provided'}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCustomerModal(true)}
+                    className="shrink-0 rounded-lg border border-emerald-700 px-2.5 py-1.5 text-[12.5px] font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-1"
+                  >
+                    Change
+                  </button>
+                </div>
+                <div className="overflow-hidden rounded-xl border border-gray-200">
                   <table className="w-full text-[13px]">
+                    <caption className="sr-only">Items in this order</caption>
                     <thead>
                       <tr className="bg-gray-50 text-left text-gray-600">
-                        <th className="px-3 py-2 font-medium">Item</th>
-                        <th className="px-3 py-2 text-right font-medium">Unit Price</th>
-                        <th className="px-3 py-2 text-center font-medium">Qty</th>
-                        <th className="px-3 py-2 text-right font-medium">Line Total</th>
+                        <th scope="col" className="px-3 py-2 font-medium">Item</th>
+                        <th scope="col" className="px-3 py-2 text-right font-medium">Unit Price</th>
+                        <th scope="col" className="px-3 py-2 text-center font-medium">Qty</th>
+                        <th scope="col" className="px-3 py-2 text-right font-medium">Line Total</th>
                       </tr>
                     </thead>
                     <tbody className="text-gray-900">
@@ -337,6 +258,7 @@ export function CheckoutScreen() {
 
               <Card
                 title="Payment Method"
+                step="2"
                 icon={
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                     <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -344,7 +266,7 @@ export function CheckoutScreen() {
                   </svg>
                 }
               >
-                <div className="grid grid-cols-5 gap-2">
+                <div role="group" aria-label="Choose a payment method" className="grid grid-cols-5 gap-2">
                   {PAY_OPTIONS.map((opt) => {
                     const selected = method === opt.id;
                     return (
@@ -352,19 +274,20 @@ export function CheckoutScreen() {
                         key={opt.id}
                         type="button"
                         onClick={() => setMethod(opt.id)}
+                        aria-pressed={selected}
                         className={cn(
-                          'relative flex flex-col items-center gap-1 rounded-lg border px-2 py-3 text-[12px] font-medium transition-colors',
+                          'relative flex flex-col items-center gap-1 rounded-xl border px-2 py-3 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-1',
                           selected
-                            ? 'border-blue-600 bg-blue-50 text-gray-900'
+                            ? 'border-emerald-700 bg-emerald-50 text-gray-900 ring-1 ring-emerald-700'
                             : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                         )}
                       >
                         {selected && (
-                          <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[11px] font-bold text-white">
+                          <span aria-hidden="true" className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-700 text-[11px] font-bold text-white">
                             ✓
                           </span>
                         )}
-                        <span className={selected ? 'text-blue-700' : 'text-gray-600'}>{opt.icon}</span>
+                        <span aria-hidden="true" className={selected ? 'text-emerald-700' : 'text-gray-500'}>{opt.icon}</span>
                         {opt.label}
                       </button>
                     );
@@ -381,7 +304,7 @@ export function CheckoutScreen() {
                         value={cashAmount}
                         onChange={(e) => setCashAmount(e.target.value)}
                         placeholder="0.00"
-                        className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                        className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                       />
                     </label>
                     <label className="block">
@@ -392,7 +315,7 @@ export function CheckoutScreen() {
                         value={cardAmount}
                         onChange={(e) => setCardAmount(e.target.value)}
                         placeholder="0.00"
-                        className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                        className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                       />
                     </label>
                     <label className="block">
@@ -403,111 +326,38 @@ export function CheckoutScreen() {
                         value={upiAmount}
                         onChange={(e) => setUpiAmount(e.target.value)}
                         placeholder="0.00"
-                        className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                        className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-100"
                       />
                     </label>
-                    <p className={cn('col-span-3 text-[12px]', splitValid ? 'text-green-600' : 'text-red-500')}>
+                    <p aria-live="polite" className={cn('col-span-3 text-[12px] font-medium', splitValid ? 'text-emerald-700' : 'text-red-600')}>
                       Split total: {formatCurrency(splitTotal)} / {formatCurrency(grandTotal)}
                     </p>
                   </div>
                 )}
 
-                {!isSplit && method === PAYMENT_METHODS.CASH && (
-                  <div className="mt-3 rounded-lg border border-gray-200 p-3">
-                    <label className="text-[13px] font-semibold text-gray-800">Cash Received</label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={cashReceived}
-                      onChange={(e) => setCashReceived(e.target.value)}
-                      placeholder={grandTotal.toFixed(2)}
-                      className="mt-2 h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none"
-                    />
-                    {cashReceived !== '' && Number(cashReceived) >= grandTotal && (
-                      <p className="mt-1.5 text-[12px] font-medium text-green-600">
-                        Change Due: {formatCurrency(Number(cashReceived) - grandTotal)}
-                      </p>
-                    )}
-                    {cashShort && (
-                      <p className="mt-1.5 text-[12px] font-medium text-red-500">
-                        Received amount is less than the total.
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  <div className="rounded-lg border border-gray-200 p-3">
-                    <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-800">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full border border-blue-500 text-[11px] font-bold text-blue-600">₹</span>
-                      Optional Tip
-                    </label>
-                    <input
-                      ref={tipRef}
-                      type="number"
-                      min="0"
-                      value={tipInput}
-                      onChange={(e) => setTipInput(e.target.value)}
-                      placeholder="₹0.00"
-                      className="mt-2 h-10 w-full rounded-lg border border-gray-300 px-3 text-sm focus:border-blue-500 focus:outline-none"
-                    />
-                    <p className="mt-1.5 text-center text-[11.5px] text-gray-500">Enter tip amount (optional)</p>
-                  </div>
-                  <div className="rounded-lg border border-gray-200 p-3">
-                    <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-800">
-                      <svg className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2" />
-                      </svg>
-                      Notes
-                    </label>
-                    <textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Add any notes for this sale (optional)"
-                      rows={2}
-                      className="mt-2 w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                    />
-                    <p className="mt-1 text-[11.5px] text-gray-500">Visible in order details</p>
-                  </div>
-                </div>
-
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => navigate(`${base}/new-sale`)}
-                    className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 text-[13.5px] font-semibold text-gray-800 hover:bg-gray-50"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50/60 p-3">
+                  <label htmlFor="checkout-notes" className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-800">
+                    <svg aria-hidden="true" className="h-4 w-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2" />
                     </svg>
-                    Back to Cart
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setHoldConfirm(true)}
-                    disabled={cart.length === 0}
-                    className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-gray-300 text-[13.5px] font-semibold text-gray-800 hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-blue-500 text-[11px] font-bold text-blue-600">⏸</span>
-                    Hold Sale
-                  </button>
-                  <button
-                    type="button"
-                    onClick={doComplete}
-                    disabled={!canComplete}
-                    className="flex h-11 flex-[1.6] items-center justify-center gap-2 rounded-lg bg-blue-600 text-[14px] font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {processing ? 'Processing...' : 'Complete Payment'}
-                  </button>
+                    Notes
+                  </label>
+                  <textarea
+                    id="checkout-notes"
+                    ref={notesRef}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add any notes for this sale (optional)"
+                    rows={2}
+                    className="mt-2 w-full resize-y rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  />
+                  <p className="mt-1 text-[11.5px] text-gray-500">Visible in order details</p>
                 </div>
               </Card>
             </div>
 
+            <div className="min-w-0 space-y-4">
             <Card
-              className="sticky top-0"
               title="Pricing Summary"
               icon={
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -518,50 +368,72 @@ export function CheckoutScreen() {
             >
               <dl className="space-y-2.5 text-[13.5px]">
                 <div className="flex justify-between">
-                  <dt className="text-gray-700">Subtotal</dt>
-                  <dd className="font-medium text-gray-900">{formatCurrency(cartTotals.subtotal)}</dd>
+                  <dt className="text-gray-600">Subtotal</dt>
+                  <dd className="font-semibold text-gray-900">{formatCurrency(cartTotals.subtotal)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-700">Tax (8%)</dt>
-                  <dd className="font-medium text-gray-900">{formatCurrency(cartTotals.tax)}</dd>
+                  <dt className="text-gray-600">Tax (8%)</dt>
+                  <dd className="font-semibold text-gray-900">{formatCurrency(cartTotals.tax)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-700">Discount</dt>
-                  <dd className="font-medium text-gray-900">{formatCurrency(billDiscount)}</dd>
+                  <dt className="text-gray-600">Discount</dt>
+                  <dd className="font-semibold text-emerald-700">−{formatCurrency(billDiscount)}</dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-gray-700">Optional Tip</dt>
-                  <dd className="font-medium text-gray-900">{formatCurrency(tip)}</dd>
+                <div className="flex justify-between border-t border-dashed border-gray-200 pt-2.5">
+                  <dt className="text-gray-600">{`Items (${cartTotals.itemCount})`}</dt>
+                  <dd className="font-semibold text-gray-900">{selectedCustomer?.name || 'Walk-in Customer'}</dd>
                 </div>
               </dl>
-              <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-                <span className="text-[16px] font-bold text-green-600">Total</span>
-                <span className="text-[22px] font-bold text-green-600">{formatCurrency(grandTotal)}</span>
+              <div aria-live="polite" className="mt-3 flex items-center justify-between rounded-xl bg-[#0C4C2A] px-4 py-3.5 shadow-[0_2px_8px_rgba(12,76,42,0.35)]">
+                <span className="text-[15px] font-bold uppercase tracking-wide text-emerald-100">Total</span>
+                <span className="text-[24px] font-bold text-white">{formatCurrency(grandTotal)}</span>
               </div>
             </Card>
+
+            <Card
+              title="Actions"
+              icon={
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              }
+            >
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={doComplete}
+                  disabled={!canComplete}
+                  aria-busy={processing}
+                  className="flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-green-600 text-[15px] font-bold text-white shadow-[0_2px_8px_rgba(22,163,74,0.4)] hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                >
+                  <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {processing ? 'Processing…' : 'Complete Payment'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHoldConfirm(true)}
+                  disabled={cart.length === 0}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-500 text-[14px] font-bold text-white shadow-[0_2px_8px_rgba(245,158,11,0.35)] hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                >
+                  Hold Sale
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(`${base}/new-sale`)}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gray-200 text-[14px] font-bold text-gray-800 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+                >
+                  <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to Cart
+                </button>
+              </div>
+            </Card>
+            </div>
           </div>
         </main>
-      </div>
-
-      {/* Shortcut footer */}
-      <footer className="flex h-9 shrink-0 items-center gap-5 overflow-x-auto border-t border-gray-200 bg-white px-4">
-        <span className="flex shrink-0 items-center gap-1.5 text-[12px] font-semibold text-gray-700">
-          <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-            <rect x="2" y="5" width="20" height="14" rx="2" />
-            <path strokeLinecap="round" d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01M9 13h6" strokeWidth={2} />
-          </svg>
-          Keyboard Shortcuts
-        </span>
-        <span className="h-4 w-px shrink-0 bg-gray-300" />
-        {FOOT_SHORTCUTS.map((s) => (
-          <span key={s.key} className="flex shrink-0 items-center gap-1.5 text-[12px]">
-            <kbd className="rounded border border-gray-300 bg-gray-50 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-gray-700">
-              {s.key}
-            </kbd>
-            <span className="text-gray-600">{s.label}</span>
-          </span>
-        ))}
-      </footer>
 
       <CustomerSelectModal
         open={customerModal}

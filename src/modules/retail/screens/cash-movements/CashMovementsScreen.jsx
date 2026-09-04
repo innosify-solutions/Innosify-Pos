@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { formatCurrency } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 import { retailConfig } from '../../config/retail.config.js';
-import { PosPageShell, POS_NAV } from '../../components/PosPageShell.jsx';
 
 const base = retailConfig.routePrefix;
 
@@ -127,22 +126,7 @@ export function CashMovementsScreen() {
   const shiftTime = new Date(shift.openedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
   return (
-    <PosPageShell
-      title={<h1 className="text-[20px] font-bold text-gray-900">Cash Movements</h1>}
-      topRight={
-        <button type="button" className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-[13px] font-medium text-gray-800 hover:border-gray-400">
-          <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          {todayLabel}
-          <svg className="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-      }
-      navItems={POS_NAV}
-      footer="secure"
-    >
+    <div className="flex h-full flex-col p-4">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
         <p className="text-[13px] text-gray-500">Record cash in and cash out movements for the current shift.</p>
         <p className="text-[12.5px] font-medium text-gray-600">
@@ -205,6 +189,6 @@ export function CashMovementsScreen() {
           )}
         </div>
       </div>
-    </PosPageShell>
+    </div>
   );
 }

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 import { retailConfig } from '../../config/retail.config.js';
-import { PosPageShell, POS_NAV } from '../../components/PosPageShell.jsx';
 
 const base = retailConfig.routePrefix;
 const PAGE_SIZE = 6;
@@ -120,39 +119,7 @@ export function SalesScreen() {
   const resetPage = (fn) => (v) => { setPage(1); fn(v); };
 
   return (
-    <PosPageShell
-      title={
-        <span className="flex items-center gap-2 text-[16px] font-semibold">
-          <span className="text-gray-900">OnePos</span>
-          <span className="h-4 w-px bg-gray-300" />
-          <span className="text-blue-600">Sales</span>
-        </span>
-      }
-      topRight={
-        <>
-          <button type="button" aria-label="Notifications" className="relative rounded-lg p-1.5 hover:bg-gray-100">
-            <svg className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">3</span>
-          </button>
-          <span className="flex items-center gap-1.5 text-[13.5px] font-semibold text-gray-900">
-            <svg className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Admin
-          </span>
-          <span className="h-5 w-px bg-gray-300" />
-          <button type="button" aria-label="Logout" className="rounded-lg p-1.5 hover:bg-gray-100">
-            <svg className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
-        </>
-      }
-      navItems={POS_NAV}
-      footer="store"
-    >
+    <div className="flex h-full flex-col p-4">
       <div className="mb-3 flex items-center gap-2.5">
         <h2 className="text-[22px] font-bold text-gray-900">Sales</h2>
         <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[12px] font-semibold text-blue-700">
@@ -296,6 +263,6 @@ export function SalesScreen() {
           </div>
         </div>
       </div>
-    </PosPageShell>
+    </div>
   );
 }

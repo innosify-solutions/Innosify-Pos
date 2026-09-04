@@ -1,1 +1,1 @@
-export { AppLayout, WorkspaceShell } from './AppLayout.jsx';
+export { AppLayout, WorkspaceShell, useRightPanel } from './AppLayout.jsx';

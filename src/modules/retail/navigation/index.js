@@ -11,6 +11,7 @@ export const retailNavigation = {
     { label: 'Customers', path: `${base}/customers`, icon: 'customers' },
     { label: 'Current Shift', path: `${base}/shift`, icon: 'shift' },
     { label: 'Cash Movements', path: `${base}/cash-movements`, icon: 'cash' },
+    { label: 'Reports', path: null, icon: 'reports' },
     { label: 'Help', path: `${base}/help`, icon: 'help' },
     { label: 'Profile', path: `${base}/profile`, icon: 'profile' },
   ],

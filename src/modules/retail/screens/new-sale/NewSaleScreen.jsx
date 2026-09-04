@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@shared/ui/Button';
 import { ConfirmationDialog } from '@shared/dialogs/ConfirmationDialog';
 import { ProductCard, CartItem, CartSummary, CategoryFilter } from '../../components/pos';
 import { categories } from '../../data/products';
@@ -13,7 +12,7 @@ import { BillDiscountModal } from './BillDiscountModal';
 
 function EmptyCartArt() {
   return (
-    <svg viewBox="0 0 120 90" className="mx-auto h-[110px] w-[140px] text-blue-200" fill="none">
+    <svg viewBox="0 0 120 90" className="mx-auto h-[110px] w-[140px] text-green-500" fill="none">
       <path d="M18 22h10l9 38h44l9-28H34" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="42" cy="72" r="6" fill="currentColor" opacity="0.9" />
       <circle cx="74" cy="72" r="6" fill="currentColor" opacity="0.9" />
@@ -32,6 +31,7 @@ export function NewSaleScreen() {
     cartTotals,
     selectedCustomer,
     billDiscount,
+    setBillDiscount,
     addToCart,
     updateCartItem,
     removeFromCart,
@@ -99,10 +99,9 @@ export function NewSaleScreen() {
   }, [cart.length, editItem, clearCart]);
 
   return (
-    <div className="flex h-full bg-[#f7f8fa]">
+    <div className="flex h-full gap-3">
       {/* Center: product area */}
-      <div className="flex min-w-0 flex-1 flex-col px-4 pb-3 pt-3">
-        <h1 className="mb-2 text-[24px] font-bold tracking-tight text-gray-900">New Sale</h1>
+      <div className="flex min-w-0 flex-1 flex-col pb-1 pt-1">
         <div className="relative mb-2.5">
           <svg
             className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500"
@@ -120,11 +119,19 @@ export function NewSaleScreen() {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleSearchKeyDown}
             placeholder="Scan barcode or search product..."
-            className="h-11 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-[14px] text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+            className="h-12 w-full rounded-xl border border-gray-300 bg-white pl-10 pr-12 text-[14px] text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
           />
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 6.707A1 1 0 013 6V4z" />
+            </svg>
+          </button>
         </div>
         <CategoryFilter categories={categories} active={activeCategory} onChange={setActiveCategory} />
-        <div className="mt-2 min-h-0 flex-1 overflow-y-auto pr-0.5">
+        <div className="thin-scroll mt-2 min-h-0 flex-1 overflow-y-auto pr-0.5">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} onSelect={addToCart} />
@@ -136,31 +143,46 @@ export function NewSaleScreen() {
         </div>
       </div>
 
-      {/* Right: cart panel */}
-      <div className="flex w-[300px] shrink-0 flex-col border-l border-gray-200 bg-white">
-        <div className="border-b border-gray-100 px-4 py-3">
-          <button
-            type="button"
-            onClick={() => setCustomerModal(true)}
-            className="flex w-full items-center gap-2 text-left"
-          >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-gray-50">
-              <svg className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      {/* Right: cart card — pure white, rounded on all four corners */}
+      <div className="flex w-[360px] shrink-0 flex-col overflow-hidden rounded-[16px] border border-gray-200 bg-white shadow-sm">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCustomerModal(true)}
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-left hover:bg-gray-100"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100">
+                <svg className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </span>
+              <span className="flex-1 truncate text-[14px] font-semibold text-gray-900">
+                {selectedCustomer?.name || 'Walk-in Customer'}
+              </span>
+              <svg className="h-4 w-4 shrink-0 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
-            </span>
-            <span className="flex-1 truncate text-[14px] font-semibold text-gray-900">
-              {selectedCustomer?.name || 'Walk-in Customer'}
-            </span>
-            <svg className="h-4 w-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
+            </button>
+            <button
+              type="button"
+              onClick={clearCart}
+              disabled={cart.length === 0}
+              className="shrink-0 self-stretch rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-[13px] font-semibold text-red-600 hover:bg-red-100 disabled:opacity-40"
+            >
+              Clear Cart
+            </button>
+          </div>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4">
+          {cart.length > 0 && (
+            <p className="pt-2 text-[13px] font-semibold text-gray-700">
+              Items ({cartTotals.itemCount})
+            </p>
+          )}
           {cart.length === 0 ? (
-            <div className="flex flex-col items-center px-2 pb-4 pt-10 text-center">
+            <div className="flex min-h-full flex-col items-center justify-center px-2 py-6 text-center">
               <EmptyCartArt />
               <p className="mt-3 text-[16px] font-bold text-gray-900">Your cart is empty</p>
               <p className="mt-1 text-[13px] text-gray-500">Add products to get started.</p>
@@ -176,41 +198,61 @@ export function NewSaleScreen() {
                   onEdit={setEditItem}
                 />
               ))}
-              <button
-                type="button"
-                onClick={() => setBillDiscountModal(true)}
-                className="mt-1 w-full text-center text-xs font-medium text-blue-600 hover:underline"
-              >
-                {billDiscount > 0 ? `Bill discount: ${formatCurrency(billDiscount)} (edit)` : 'Apply Bill Discount'}
-              </button>
             </div>
           )}
         </div>
 
-        <div className="border-t border-gray-100 px-4 py-3">
+        <div className="px-4 py-4">
+          {billDiscount > 0 ? (
+            <div className="mb-3 flex items-center justify-between rounded-lg bg-green-50 px-3 py-2">
+              <span className="text-[13px] font-semibold text-green-700">
+                Discount applied: −{formatCurrency(billDiscount)}
+              </span>
+              <button
+                type="button"
+                onClick={() => setBillDiscount(0)}
+                className="text-[12.5px] font-semibold text-green-700 underline hover:text-green-900"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              disabled={cart.length === 0}
+              onClick={() => setBillDiscountModal(true)}
+              className="mb-3 flex items-center gap-1.5 text-[13px] font-semibold text-emerald-700 hover:text-emerald-900 hover:underline disabled:opacity-40 disabled:no-underline"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
+              Apply Discount
+            </button>
+          )}
           <CartSummary totals={cartTotals} billDiscount={billDiscount} />
-          <div className="mt-3 flex gap-2">
-            <Button
-              variant="outline"
-              className="h-11 flex-1 rounded-lg border-gray-300 text-[14px] font-semibold"
+          <div className="mt-4 flex gap-3">
+            <button
+              type="button"
               disabled={cart.length === 0}
               onClick={() => setHoldConfirm(true)}
+              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white text-[14px] font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
               </svg>
               Hold
-            </Button>
-            <Button
-              className="h-11 flex-[1.4] rounded-lg bg-blue-600 text-[14px] font-semibold hover:bg-blue-700"
+            </button>
+            <button
+              type="button"
               disabled={cart.length === 0}
               onClick={goToCheckout}
+              className="flex h-12 flex-[1.3] items-center justify-center gap-2 rounded-xl bg-[#1a5c3a] text-[14px] font-semibold text-white hover:bg-[#15502f] disabled:opacity-50"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               Checkout
-            </Button>
+            </button>
           </div>
         </div>
       </div>

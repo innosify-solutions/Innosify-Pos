@@ -4,7 +4,6 @@ import { ConfirmationDialog } from '@shared/dialogs/ConfirmationDialog';
 import { calculateCartTotals, formatCurrency } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 import { retailConfig } from '../../config/retail.config.js';
-import { PosPageShell, CustomerPill, POS_NAV } from '../../components/PosPageShell.jsx';
 
 const base = retailConfig.routePrefix;
 
@@ -42,12 +41,7 @@ export function HeldSalesScreen() {
   };
 
   return (
-    <PosPageShell
-      title={<h1 className="text-[18px] font-bold text-gray-900">Held Sales</h1>}
-      topRight={<CustomerPill showAvatar avatarText={(selectedCustomer?.name || 'A').charAt(0)} />}
-      navItems={POS_NAV}
-      footer="logout"
-    >
+    <div className="flex h-full flex-col p-4">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-[22px] font-bold text-gray-900">
@@ -180,6 +174,6 @@ export function HeldSalesScreen() {
         message="This held sale will be permanently removed. This cannot be undone."
         confirmLabel="Delete"
       />
-    </PosPageShell>
+    </div>
   );
 }

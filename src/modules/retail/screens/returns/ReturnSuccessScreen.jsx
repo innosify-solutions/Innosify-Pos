@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 import { retailConfig } from '../../config/retail.config.js';
-import { PosPageShell, CustomerPill, POS_NAV } from '../../components/PosPageShell.jsx';
 import { LAST_RETURN_KEY } from './ReturnsScreen.jsx';
 
 const base = retailConfig.routePrefix;
@@ -65,19 +64,7 @@ export function ReturnSuccessScreen() {
   }
 
   return (
-    <PosPageShell
-      title={<h1 className="text-[20px] font-bold text-gray-900">Return Processed</h1>}
-      topRight={<CustomerPill />}
-      navItems={POS_NAV}
-      footer={null}
-      shortcuts={[
-        { key: 'F1', label: 'Help' },
-        { key: 'F2', label: 'Print' },
-        { key: 'F3', label: 'Email' },
-        { key: 'F4', label: 'New Return' },
-        { key: 'Esc', label: 'Close' },
-      ]}
-    >
+    <div className="flex h-full flex-col items-center p-4">
       <div className="mx-auto flex w-full max-w-xl flex-col items-center px-4 pt-6 text-center">
         <span className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-green-200/70 ring-8 ring-green-100">
           <svg className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="#22c55e" strokeWidth={3}>
@@ -157,6 +144,6 @@ export function ReturnSuccessScreen() {
           Back to Sales
         </button>
       </div>
-    </PosPageShell>
+    </div>
   );
 }

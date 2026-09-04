@@ -4,6 +4,6 @@
  * Must NOT contain business-specific screens or components.
  */
 
-export { AppLayout, WorkspaceShell } from './layout';
+export { AppLayout, WorkspaceShell, useRightPanel } from './layout';
 export { ThemeProvider, useTheme } from './theme';
 export { NavigationShell } from './navigation';

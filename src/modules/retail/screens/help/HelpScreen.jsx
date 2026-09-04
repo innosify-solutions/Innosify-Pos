@@ -1,5 +1,3 @@
-import { RetailPage } from '../../layouts/RetailPage';
-
 const shortcuts = [
   { keys: 'F1', action: 'New Sale' },
   { keys: 'F2', action: 'Search Product' },
@@ -12,7 +10,8 @@ const shortcuts = [
 
 export function HelpScreen() {
   return (
-    <RetailPage title="Help">
+    <div className="flex h-full flex-col p-4">
+      <h1 className="mb-4 text-[20px] font-bold text-gray-900">Help</h1>
       <div className="max-w-lg">
         <h2 className="mb-4 text-base font-semibold text-content">Keyboard Shortcuts</h2>
         <div className="space-y-2">
@@ -28,6 +27,6 @@ export function HelpScreen() {
           <p className="text-sm text-content-muted">For technical support, contact your store administrator or Innosify support at support@innosify.com</p>
         </div>
       </div>
-    </RetailPage>
+    </div>
   );
 }

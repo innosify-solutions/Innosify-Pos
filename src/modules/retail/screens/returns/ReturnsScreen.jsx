@@ -5,7 +5,6 @@ import { TAX_RATE } from '../../constants/cashier.constants.js';
 import { formatCurrency } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 import { retailConfig } from '../../config/retail.config.js';
-import { PosPageShell, CustomerPill, POS_NAV } from '../../components/PosPageShell.jsx';
 import { AddCustomerModal } from '../new-sale/AddCustomerModal';
 
 const base = retailConfig.routePrefix;
@@ -18,7 +17,7 @@ const REFUND_METHODS = [
   { id: 'store_credit', label: 'Store Credit' },
 ];
 
-const CATEGORY_EMOJI = { clothing: '👕', sarees: '🥻', ethnic: '👘', western: '👚', accessories: '👜' };
+const CATEGORY_EMOJI = { silk: '🥻', cotton: '🥻', banarasi: '🥻', kanjivaram: '🥻', chiffon: '🥻', georgette: '🥻', linen: '🥻', sarees: '🥻' };
 const METHOD_LABELS = { cash: 'Cash', card: 'Card', store_credit: 'Store Credit' };
 
 export function ReturnsScreen() {
@@ -139,20 +138,7 @@ export function ReturnsScreen() {
   });
 
   return (
-    <PosPageShell
-      title={<h1 className="text-[20px] font-bold text-gray-900">Returns & Exchanges</h1>}
-      topRight={<CustomerPill />}
-      navItems={POS_NAV}
-      footer={null}
-      shortcuts={[
-        { key: 'F1', label: 'Help' },
-        { key: 'F2', label: 'Search' },
-        { key: 'F3', label: 'Find Sale' },
-        { key: 'F4', label: 'Process Return' },
-        { key: 'F5', label: 'New Customer' },
-        { key: 'Esc', label: 'Clear' },
-      ]}
-    >
+    <div className="flex h-full flex-col p-4">
       <div className="relative mb-3">
         <svg className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -377,6 +363,6 @@ export function ReturnsScreen() {
       )}
 
       <AddCustomerModal open={addCustomerModal} onClose={() => setAddCustomerModal(false)} />
-    </PosPageShell>
+    </div>
   );
 }

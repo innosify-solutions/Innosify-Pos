@@ -1,4 +1,3 @@
-import { RetailPage } from '../../layouts/RetailPage';
 import { useCashier } from '../../store';
 import { useTheme } from '@core/theme';
 import { Button } from '@shared/ui/Button';
@@ -8,7 +7,8 @@ export function ProfileScreen() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <RetailPage title="Profile">
+    <div className="flex h-full flex-col p-4">
+      <h1 className="mb-4 text-[20px] font-bold text-gray-900">Profile</h1>
       <div className="max-w-md">
         <div className="mb-6 flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent-muted text-2xl font-bold text-accent">
@@ -37,6 +37,6 @@ export function ProfileScreen() {
           </div>
         </div>
       </div>
-    </RetailPage>
+    </div>
   );
 }

@@ -6,7 +6,6 @@ import { EmptyState } from '@shared/feedback/EmptyState';
 import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '@shared/tables/Table';
 import { Drawer } from '@shared/dialogs/Drawer';
 import { Modal, ModalFooter } from '@shared/dialogs/Modal';
-import { RetailPage } from '../../layouts/RetailPage';
 import { formatCurrency, formatDate } from '../../utils/cashier.utils';
 import { useCashier } from '../../store';
 
@@ -42,7 +41,8 @@ export function CustomersScreen() {
   };
 
   return (
-    <RetailPage title="Customers">
+    <div className="flex h-full flex-col p-4">
+      <h1 className="mb-4 text-[20px] font-bold text-gray-900">Customers</h1>
       <div className="mb-4 flex items-center gap-4">
         <SearchField
           placeholder="Search customers..."
@@ -127,6 +127,6 @@ export function CustomersScreen() {
           <Input label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
       </Modal>
-    </RetailPage>
+    </div>
   );
 }

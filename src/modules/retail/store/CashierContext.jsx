@@ -145,6 +145,10 @@ export function CashierProvider({ children }) {  const [products, setProducts] =
         {
           productId: product.id,
           name: product.name,
+          sku: product.sku,
+          category: product.category,
+          image: product.image,
+          swatch: product.swatch,
           price: product.price,
           quantity: 1,
           discount: 0,
