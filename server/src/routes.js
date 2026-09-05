@@ -103,13 +103,13 @@ products.get('/:id', (req, res) => {
   res.json(mapProduct(row));
 });
 products.post('/', (req, res) => {
-  const { id, name, sku, barcode, price, category, stock = 0 } = req.body || {};
+  const { id, name, sku, barcode, price, category, stock = 0, swatch = '', image = '' } = req.body || {};
   if (!id || !name || price == null || !category) {
     return res.status(400).json({ error: 'id, name, price and category are required' });
   }
   try {
-    db.prepare('INSERT INTO products (id, name, sku, barcode, price, category, stock) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .run(id, name, sku || '', barcode || '', Number(price), category, Number(stock) || 0);
+    db.prepare('INSERT INTO products (id, name, sku, barcode, price, category, stock, swatch, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(id, name, sku || '', barcode || '', Number(price), category, Number(stock) || 0, swatch || '', image || '');
   } catch (err) {
     if (String(err.message).includes('UNIQUE')) return res.status(409).json({ error: `Product '${id}' already exists` });
     throw err;
@@ -120,8 +120,8 @@ products.patch('/:id', (req, res) => {
   const row = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
   if (!row) return notFound(res, 'Product', req.params.id);
   const next = { ...mapProduct(row), ...(req.body || {}), id: row.id };
-  db.prepare('UPDATE products SET name = ?, sku = ?, barcode = ?, price = ?, category = ?, stock = ? WHERE id = ?')
-    .run(next.name, next.sku, next.barcode, Number(next.price), next.category, Number(next.stock) || 0, row.id);
+  db.prepare('UPDATE products SET name = ?, sku = ?, barcode = ?, price = ?, category = ?, stock = ?, swatch = ?, image = ? WHERE id = ?')
+    .run(next.name, next.sku, next.barcode, Number(next.price), next.category, Number(next.stock) || 0, next.swatch || '', next.image || '', row.id);
   res.json(mapProduct(db.prepare('SELECT * FROM products WHERE id = ?').get(row.id)));
 });
 

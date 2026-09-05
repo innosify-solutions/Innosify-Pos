@@ -1,23 +1,18 @@
 /**
- * Seed data — mirrors the frontend demo catalog (Takshi sarees).
+ * Seed data — Takshi master product list + matching demo transactions.
  * Only inserted into empty tables on first boot.
  */
 const products = [
-  { id: 's1', name: 'Banarasi Silk Saree — Royal Red', sku: '300001', barcode: '300001', price: 5499, category: 'banarasi', stock: 5 },
-  { id: 's2', name: 'Kanjivaram Silk Saree — Temple Green', sku: '300002', barcode: '300002', price: 7999, category: 'kanjivaram', stock: 12 },
-  { id: 's3', name: 'Chanderi Cotton Saree — Sky Blue', sku: '300003', barcode: '300003', price: 1899, category: 'cotton', stock: 40 },
-  { id: 's4', name: 'Chiffon Saree — Blush Pink', sku: '300004', barcode: '300004', price: 1499, category: 'chiffon', stock: 60 },
-  { id: 's5', name: 'Georgette Saree — Wine Maroon', sku: '300005', barcode: '300005', price: 2299, category: 'georgette', stock: 35 },
-  { id: 's6', name: 'Tussar Silk Saree — Golden Beige', sku: '300006', barcode: '300006', price: 3999, category: 'silk', stock: 8 },
-  { id: 's7', name: 'Linen Saree — Ivory White', sku: '300007', barcode: '300007', price: 2599, category: 'linen', stock: 25 },
-  { id: 's8', name: 'Bandhani Saree — Festive Orange', sku: '300008', barcode: '300008', price: 2799, category: 'cotton', stock: 30 },
-  { id: 's9', name: 'Mysore Silk Saree — Royal Purple', sku: '300009', barcode: '300009', price: 6499, category: 'silk', stock: 10 },
-  { id: 's10', name: 'Organza Saree — Pastel Mint', sku: '300010', barcode: '300010', price: 3199, category: 'chiffon', stock: 22 },
-  { id: 's11', name: 'Ajrakh Cotton Saree — Indigo', sku: '300011', barcode: '300011', price: 1999, category: 'cotton', stock: 45 },
-  { id: 's12', name: 'Patola Silk Saree — Multicolor', sku: '300012', barcode: '300012', price: 8999, category: 'silk', stock: 4 },
-  { id: 's13', name: 'Crepe Saree — Charcoal Black', sku: '300013', barcode: '300013', price: 1799, category: 'georgette', stock: 50 },
-  { id: 's14', name: 'Maheshwari Saree — Turquoise', sku: '300014', barcode: '300014', price: 2499, category: 'cotton', stock: 28 },
-  { id: 's15', name: 'Net Embroidered Saree — Bridal Red', sku: '300015', barcode: '300015', price: 5999, category: 'banarasi', stock: 7 },
+  { id: 'p1', name: 'Kanjivaram Silk Saree — Red Gold Zari', sku: 'KK5000401', barcode: 'KK5000401', price: 245, category: 'Kanjivaram', stock: 20, image: '/images/products/p1.jpg', swatch: 'linear-gradient(135deg,#b91c1c,#d97706)' },
+  { id: 'p2', name: 'Kanjivaram Silk Saree — Green Gold Zari', sku: 'KK5000402', barcode: 'KK5000402', price: 320, category: 'Green Gold', stock: 5, image: '/images/products/p2.jpg', swatch: 'linear-gradient(135deg,#047857,#65a30d)' },
+  { id: 'p3', name: 'Banarasi Silk Saree', sku: 'BSL00401', barcode: 'BSL00401', price: 935, category: 'Banarasi Silk', stock: 66, image: '/images/products/p3.jpg', swatch: 'linear-gradient(135deg,#ea580c,#be123c)' },
+  { id: 'p4', name: 'Soft Silk Saree', sku: 'SSL00402', barcode: 'SSL00402', price: 435, category: 'Soft Silk', stock: 23, image: '/images/products/p4.jpg', swatch: 'linear-gradient(135deg,#ec4899,#a21caf)' },
+  { id: 'p5', name: 'Cotton Saree', sku: 'COT00308', barcode: 'COT00308', price: 330, category: 'Cotton Saree', stock: 12, image: '/images/products/p5.jpg', swatch: 'linear-gradient(135deg,#0284c7,#4338ca)' },
+  { id: 'p6', name: 'Chanderi Saree', sku: 'FS500322', barcode: 'FS500322', price: 350, category: 'Cotton Saree', stock: 6, image: '/images/products/p6.webp', swatch: 'linear-gradient(135deg,#fb7185,#f97316)' },
+  { id: 'p7', name: 'Chanderi Saree', sku: 'HK500304', barcode: 'HK500304', price: 300, category: 'Saree', stock: 20, image: '/images/products/p7.jpg', swatch: 'linear-gradient(135deg,#65a30d,#047857)' },
+  { id: 'p8', name: 'Mysore Silk Saree', sku: 'MYS00501', barcode: 'MYS00501', price: 520, category: 'Mysore Silk', stock: 15, image: '/images/products/p8.jpg', swatch: 'linear-gradient(135deg,#7c3aed,#6b21a8)' },
+  { id: 'p9', name: 'Organza Saree', sku: 'ORG00601', barcode: 'ORG00601', price: 275, category: 'Saree', stock: 0, image: '/images/products/p9.jpg', swatch: 'linear-gradient(135deg,#14b8a6,#0e7490)' },
+  { id: 'p10', name: 'Linen Saree', sku: 'LIN00702', barcode: 'LIN00702', price: 310, category: 'Linen', stock: 9, image: '/images/products/p10.jpg', swatch: 'linear-gradient(135deg,#78716c,#b45309)' },
 ];
 
 const customers = [
@@ -31,65 +26,71 @@ const sales = [
   {
     id: 'ORD-100245', date: '2026-09-02T14:45:00', customerId: 'c1', customerName: 'Walk-in Customer',
     items: [
-      { productId: 's1', name: 'Banarasi Silk Saree — Royal Red', quantity: 1, price: 5499, total: 5499 },
-      { productId: 's5', name: 'Georgette Saree — Wine Maroon', quantity: 1, price: 2299, total: 2299 },
+      { productId: 'p1', name: 'Kanjivaram Silk Saree — Red Gold Zari', quantity: 1, price: 245, total: 245 },
+      { productId: 'p3', name: 'Banarasi Silk Saree', quantity: 1, price: 935, total: 935 },
     ],
-    subtotal: 7798, discount: 0, tax: 624, tip: 0, total: 8422,
-    amountReceived: 9000, changeDue: 578, paymentMethod: 'cash', status: 'completed', cashier: 'Walk-in Cashier',
+    subtotal: 1180, discount: 0, tax: 94.4, tip: 0, total: 1274.4,
+    amountReceived: 1300, changeDue: 25.6, paymentMethod: 'cash', status: 'completed', cashier: 'Walk-in Cashier',
   },
   {
     id: 'ORD-100244', date: '2026-09-02T11:48:00', customerId: 'c3', customerName: 'Priya Sharma',
     items: [
-      { productId: 's2', name: 'Kanjivaram Silk Saree — Temple Green', quantity: 1, price: 7999, total: 7999 },
-      { productId: 's14', name: 'Maheshwari Saree — Turquoise', quantity: 1, price: 2499, total: 2499 },
+      { productId: 'p8', name: 'Mysore Silk Saree', quantity: 2, price: 520, total: 1040 },
+      { productId: 'p5', name: 'Cotton Saree', quantity: 1, price: 330, total: 330 },
     ],
-    subtotal: 10498, discount: 0, tax: 840, tip: 0, total: 11338,
-    amountReceived: 4212, changeDue: 0, paymentMethod: 'card', status: 'paid', cashier: 'Walk-in Cashier',
+    subtotal: 1370, discount: 0, tax: 109.6, tip: 0, total: 1479.6,
+    amountReceived: 1479.6, changeDue: 0, paymentMethod: 'card', status: 'paid', cashier: 'Walk-in Cashier',
   },
   {
     id: 'ORD-100243', date: '2026-09-02T11:32:00', customerId: 'c2', customerName: 'Rajesh Kumar',
     items: [
-      { productId: 's3', name: 'Chanderi Cotton Saree — Sky Blue', quantity: 2, price: 1899, total: 3798 },
-      { productId: 's12', name: 'Patola Silk Saree — Multicolor', quantity: 1, price: 8999, total: 8999 },
+      { productId: 'p4', name: 'Soft Silk Saree', quantity: 1, price: 435, total: 435 },
+      { productId: 'p10', name: 'Linen Saree', quantity: 1, price: 310, total: 310 },
+      { productId: 'p6', name: 'Chanderi Saree', quantity: 1, price: 350, total: 350 },
     ],
-    subtotal: 12797, discount: 200, tax: 1008, tip: 0, total: 13605,
-    amountReceived: 6048, changeDue: 0, paymentMethod: 'upi', status: 'paid', cashier: 'Walk-in Cashier',
+    subtotal: 1095, discount: 0, tax: 87.6, tip: 0, total: 1182.6,
+    amountReceived: 1182.6, changeDue: 0, paymentMethod: 'upi', status: 'paid', cashier: 'Walk-in Cashier',
   },
   {
     id: 'ORD-100242', date: '2026-09-02T11:15:00', customerId: 'c1', customerName: 'Walk-in Customer',
     items: [
-      { productId: 's4', name: 'Chiffon Saree — Blush Pink', quantity: 1, price: 1499, total: 1499 },
-      { productId: 's10', name: 'Organza Saree — Pastel Mint', quantity: 2, price: 3199, total: 6398 },
+      { productId: 'p2', name: 'Kanjivaram Silk Saree — Green Gold Zari', quantity: 1, price: 320, total: 320 },
     ],
-    subtotal: 7897, discount: 0, tax: 632, tip: 0, total: 8529,
-    amountReceived: 9000, changeDue: 471, paymentMethod: 'cash', status: 'completed', cashier: 'Walk-in Cashier',
+    subtotal: 320, discount: 0, tax: 25.6, tip: 0, total: 345.6,
+    amountReceived: 345.6, changeDue: 0, paymentMethod: 'cash', status: 'completed', cashier: 'Walk-in Cashier',
   },
   {
     id: 'ORD-100241', date: '2026-09-02T10:59:00', customerId: 'c4', customerName: 'Amit Patel',
-    items: [{ productId: 's9', name: 'Mysore Silk Saree — Royal Purple', quantity: 1, price: 6499, total: 6499 }],
-    subtotal: 6499, discount: 0, tax: 520, tip: 100, total: 7119,
-    amountReceived: 4960, changeDue: 0, paymentMethod: 'card', status: 'completed', cashier: 'Walk-in Cashier',
+    items: [
+      { productId: 'p3', name: 'Banarasi Silk Saree', quantity: 1, price: 935, total: 935 },
+      { productId: 'p7', name: 'Chanderi Saree', quantity: 2, price: 300, total: 600 },
+    ],
+    subtotal: 1535, discount: 0, tax: 122.8, tip: 0, total: 1657.8,
+    amountReceived: 1657.8, changeDue: 0, paymentMethod: 'card', status: 'completed', cashier: 'Walk-in Cashier',
   },
   {
     id: 'ORD-100240', date: '2026-09-02T10:41:00', customerId: 'c1', customerName: 'Walk-in Customer',
     items: [
-      { productId: 's7', name: 'Linen Saree — Ivory White', quantity: 1, price: 2599, total: 2599 },
-      { productId: 's8', name: 'Bandhani Saree — Festive Orange', quantity: 1, price: 2799, total: 2799 },
+      { productId: 'p5', name: 'Cotton Saree', quantity: 2, price: 330, total: 660 },
     ],
-    subtotal: 5398, discount: 0, tax: 432, tip: 0, total: 5830,
-    amountReceived: 6000, changeDue: 170, paymentMethod: 'cash', status: 'paid', cashier: 'Walk-in Cashier',
+    subtotal: 660, discount: 0, tax: 52.8, tip: 0, total: 712.8,
+    amountReceived: 800, changeDue: 87.2, paymentMethod: 'cash', status: 'paid', cashier: 'Walk-in Cashier',
   },
   {
     id: 'ORD-100239', date: '2026-09-01T16:20:00', customerId: 'c3', customerName: 'Priya Sharma',
-    items: [{ productId: 's15', name: 'Net Embroidered Saree — Bridal Red', quantity: 1, price: 5999, total: 5999 }],
-    subtotal: 5999, discount: 0, tax: 480, tip: 0, total: 6479,
-    amountReceived: 3024, changeDue: 0, paymentMethod: 'upi', status: 'completed', cashier: 'Walk-in Cashier',
+    items: [
+      { productId: 'p10', name: 'Linen Saree', quantity: 1, price: 310, total: 310 },
+    ],
+    subtotal: 310, discount: 0, tax: 24.8, tip: 0, total: 334.8,
+    amountReceived: 334.8, changeDue: 0, paymentMethod: 'upi', status: 'completed', cashier: 'Walk-in Cashier',
   },
   {
     id: 'ORD-100238', date: '2026-09-01T10:22:00', customerId: 'c2', customerName: 'Rajesh Kumar',
-    items: [{ productId: 's13', name: 'Crepe Saree — Charcoal Black', quantity: 2, price: 1799, total: 3598 }],
-    subtotal: 3598, discount: 0, tax: 288, tip: 0, total: 3886,
-    amountReceived: 1080, changeDue: 0, paymentMethod: 'cash', status: 'voided', cashier: 'Walk-in Cashier',
+    items: [
+      { productId: 'p6', name: 'Chanderi Saree', quantity: 1, price: 350, total: 350 },
+    ],
+    subtotal: 350, discount: 0, tax: 28, tip: 0, total: 378,
+    amountReceived: 378, changeDue: 0, paymentMethod: 'cash', status: 'voided', cashier: 'Walk-in Cashier',
   },
 ];
 
@@ -97,24 +98,24 @@ const heldSales = [
   {
     id: 'HS-1001', heldAt: '2026-09-02T10:15:00', customerId: 'c1', customerName: 'Walk-in Customer',
     items: [
-      { productId: 's1', name: 'Banarasi Silk Saree — Royal Red', quantity: 2, price: 5499, discount: 0, priceOverride: null },
-      { productId: 's6', name: 'Tussar Silk Saree — Golden Beige', quantity: 1, price: 3999, discount: 0, priceOverride: null },
+      { productId: 'p1', name: 'Kanjivaram Silk Saree — Red Gold Zari', quantity: 1, price: 245, discount: 0, priceOverride: null },
+      { productId: 'p4', name: 'Soft Silk Saree', quantity: 1, price: 435, discount: 0, priceOverride: null },
     ],
-    billDiscount: 0, note: 'Customer selecting blouse stitching', heldBy: 'Alice Smith',
+    billDiscount: 0, note: 'Customer went to check size', heldBy: 'Alice Smith',
   },
   {
     id: 'HS-1002', heldAt: '2026-09-02T09:42:00', customerId: 'c2', customerName: 'John Davis',
     items: [
-      { productId: 's3', name: 'Chanderi Cotton Saree — Sky Blue', quantity: 1, price: 1899, discount: 0, priceOverride: null },
-      { productId: 's11', name: 'Ajrakh Cotton Saree — Indigo', quantity: 2, price: 1999, discount: 0, priceOverride: null },
+      { productId: 'p3', name: 'Banarasi Silk Saree', quantity: 1, price: 935, discount: 0, priceOverride: null },
+      { productId: 'p8', name: 'Mysore Silk Saree', quantity: 1, price: 520, discount: 0, priceOverride: null },
     ],
-    billDiscount: 100, note: '', heldBy: 'Michael Brown',
+    billDiscount: 0, note: '', heldBy: 'Michael Brown',
   },
   {
     id: 'HS-1003', heldAt: '2026-09-01T16:31:00', customerId: 'c1', customerName: 'Walk-in Customer',
     items: [
-      { productId: 's2', name: 'Kanjivaram Silk Saree — Temple Green', quantity: 1, price: 7999, discount: 0, priceOverride: null },
-      { productId: 's4', name: 'Chiffon Saree — Blush Pink', quantity: 2, price: 1499, discount: 0, priceOverride: null },
+      { productId: 'p5', name: 'Cotton Saree', quantity: 2, price: 330, discount: 0, priceOverride: null },
+      { productId: 'p7', name: 'Chanderi Saree', quantity: 1, price: 300, discount: 0, priceOverride: null },
     ],
     billDiscount: 0, note: 'Waiting for family approval', heldBy: 'Alice Smith',
   },
@@ -137,8 +138,8 @@ const shifts = [
 
 function seedDatabase(db, isTableEmpty) {
   if (isTableEmpty('products')) {
-    const stmt = db.prepare('INSERT INTO products (id, name, sku, barcode, price, category, stock) VALUES (?, ?, ?, ?, ?, ?, ?)');
-    for (const p of products) stmt.run(p.id, p.name, p.sku, p.barcode, p.price, p.category, p.stock);
+    const stmt = db.prepare('INSERT INTO products (id, name, sku, barcode, price, category, stock, swatch, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    for (const p of products) stmt.run(p.id, p.name, p.sku, p.barcode, p.price, p.category, p.stock, p.swatch || '', p.image || '');
   }
   if (isTableEmpty('customers')) {
     const stmt = db.prepare('INSERT INTO customers (id, name, phone, email, is_default, loyalty_points, total_purchases, purchase_history) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');

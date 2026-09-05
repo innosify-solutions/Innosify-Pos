@@ -22,7 +22,9 @@ db.exec(`
     barcode TEXT NOT NULL,
     price REAL NOT NULL,
     category TEXT NOT NULL,
-    stock INTEGER NOT NULL DEFAULT 0
+    stock INTEGER NOT NULL DEFAULT 0,
+    swatch TEXT DEFAULT '',
+    image TEXT DEFAULT ''
   );
   CREATE TABLE IF NOT EXISTS customers (
     id TEXT PRIMARY KEY,
@@ -99,6 +101,15 @@ db.exec(`
 function isTableEmpty(table) {
   const row = db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get();
   return row.n === 0;
+}
+
+// Lightweight migration for databases created before a column existed.
+const productCols = db.prepare('PRAGMA table_info(products)').all();
+if (!productCols.some((c) => c.name === 'swatch')) {
+  db.exec("ALTER TABLE products ADD COLUMN swatch TEXT DEFAULT ''");
+}
+if (!productCols.some((c) => c.name === 'image')) {
+  db.exec("ALTER TABLE products ADD COLUMN image TEXT DEFAULT ''");
 }
 
 module.exports = { db, isTableEmpty };

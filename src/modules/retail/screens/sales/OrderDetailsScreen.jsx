@@ -172,7 +172,7 @@ export function OrderDetailsScreen() {
                     <tr key={`${item.productId}-${i}`} className="border-t border-gray-100">
                       <td className="px-3 py-2.5">
                         <span className="flex items-center gap-2 font-medium text-gray-900">
-                          <span className="text-[20px]">{CATEGORY_EMOJI[p?.category] || '👕'}</span>
+                          <span className="text-[20px]">{CATEGORY_EMOJI[p?.category] || '🥻'}</span>
                           {item.name}
                         </span>
                       </td>

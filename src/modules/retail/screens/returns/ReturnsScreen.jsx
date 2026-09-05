@@ -238,7 +238,7 @@ export function ReturnsScreen() {
                       className="h-4.5 w-4.5 h-[18px] w-[18px] shrink-0 accent-blue-600"
                     />
                     <span className="flex h-14 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-[28px]">
-                      {CATEGORY_EMOJI[p?.category] || '👕'}
+                      {CATEGORY_EMOJI[p?.category] || '🥻'}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13.5px] font-bold text-gray-900">{item.name}</span>
@@ -292,7 +292,7 @@ export function ReturnsScreen() {
                 return (
                   <div key={idx} className="flex items-center gap-2 text-[12.5px]">
                     <span className="flex h-9 w-8 shrink-0 items-center justify-center rounded bg-gray-50 text-[20px]">
-                      {CATEGORY_EMOJI[p?.category] || '👕'}
+                      {CATEGORY_EMOJI[p?.category] || '🥻'}
                     </span>
                     <span className="min-w-0 flex-1 truncate font-medium text-gray-800">{l.item.name}</span>
                     <span className="text-gray-500">× {l.qty}</span>
